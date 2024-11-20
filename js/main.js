@@ -1,11 +1,27 @@
+// GSAP 라이브러리의 스크롤트리거를 등록
+gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(TextPlugin);
+
 window.onload = function () {
 
-    // GSAP 라이브러리의 스크롤트리거를 등록
-    gsap.registerPlugin(ScrollTrigger); 
-
     cursorFunc();
+    animateScrollText();
+    animateIndexElement();
+    initGallery();
+    handleScroll();
+    pinSections();
+
+    // rolling text style 
+    const items = document.querySelectorAll(".section1 .rolling-text .rotate li.slide-in-out");
+  
+    items.forEach((item, index) => {
+      const delay = 1 + index * 0.5; // 1초부터 시작, 0.5초씩 증가
+      item.style.animation = `slide-in-out-bottom 1s linear both ${delay}s`;
+    });
+
+    
 }
-// 01 cursor event 
+// cursor event 
 function cursorFunc() {
     var cursorBall = document.querySelector('.cursor-ball');
     var cursorBallSvg = document.querySelector('.cursor-ball svg');
@@ -70,7 +86,7 @@ function cursorFunc() {
         el.addEventListener('mouseleave', () => {
             gsap.to(cursorBallSvg, {
                 duration: 0.3,
-                scale: 0.8
+                scale: 0.8,
             })
 
             const textElement = cursorBall.querySelector('.text');
@@ -84,4 +100,143 @@ function cursorFunc() {
         })
       
     });   
+}
+
+// Scroll animation .scroll-text element [TextPlugin]
+function animateScrollText() {
+	const scrollText = document.querySelector(".scroll-text");
+
+	gsap.to(scrollText, {
+		duration: 1,
+		repeat: -1,
+		yoyo: true,
+		repeatDelay: 2,
+		text: {
+			value: "Down",
+			newClass: "rose-text"
+		}
+	});
+}
+
+
+// ScrollTrigger for .layout-main class element
+function animateIndexElement() {
+    const visualT = document.querySelector('.visual-text');
+    const scrollT = document.querySelector('.scroll-text');
+    const main = document.querySelector('.main');
+
+	gsap.to(main, {
+		scrollTrigger: {
+			trigger: ".section3",
+			start: "top center", 
+			endTrigger: ".section4", 
+			end: "bottom top",
+			scrub: 2,
+			toggleActions: "play none reverse none",
+			onEnter: () => main.classList.add("white"),
+			onLeaveBack: () => main.classList.remove("white"),
+			//markers:true
+		},
+	});
+	gsap.to(visualT , {
+		y: "-=400", 
+		scrollTrigger: {
+			trigger: ".section1",
+			start:"top top", 
+			scrub: 2,
+			toggleActions: "play none reverse none", //스크롤 이벤트에 따라 애니메이션 동작을 설정
+			onEnter: () => scrollT.classList.add("hide"), 
+           onLeaveBack: () => scrollT.classList.remove("hide"),
+            // markers: true,
+		},
+	}); 
+} 
+
+// section2 gallery .card scroll Parallax
+const gallery = document.querySelector('.gallery');
+const track = document.querySelector('.gallery-track');
+const cards = document.querySelectorAll('.card');
+const easing = 0.05;
+let scrollY = 0;
+let targetY = 0;
+
+// 선형 보간 함수, 두 값을 부르덥게 연결한다. 
+const lerp = (start, end, t) => start * (1 - t) + end * t;
+
+function updateScroll() {
+    scrollY = lerp(scrollY, targetY, easing);
+    track.style.transform = `translateY(-${scrollY}px)`;
+
+    activateParallax();
+
+    if (Math.abs(scrollY - targetY) > 0.1) {
+        //스크롤 애니메이션을 지속적으로 업데이트
+        requestAnimationFrame(updateScroll);
+    }
+}
+
+// 스크롤에 따라 카드 이미지가 위아래로 자연스럽게 움직이는 효과
+function activateParallax() {
+    cards.forEach((card) => {
+        const wrapper = card.querySelector('.card-image-wrap');
+        const diff = card.offsetHeight - wrapper.offsetHeight; // card와 wrapper의 높이 차
+        const progress = card.getBoundingClientRect().top / window.innerHeight; // getBoundingClientRect().top : 화면에서의 위치
+        wrapper.style.transform = `translateY(${diff * progress}px)`;
+    })
+}
+
+function initGallery() {
+    gallery.style.height = `${track.clientHeight}px`;
+    targetY = window.scrollY;
+    updateScroll();
+}
+
+window.addEventListener('scroll', () => {
+    targetY = window.scrollY;
+    updateScroll();
+  });
+  
+// .text-wrap scroll opacity 
+function handleScroll() {
+    const txtWrap = document.querySelectorAll(".text-wrap");
+    
+    gsap.utils.toArray(".text-wrap").forEach((txtWrap) => {
+        const text = txtWrap.querySelector(".text");
+        const numWords = text.children.length;
+
+        gsap.to(text.children, {
+          opacity: 1,
+          stagger: {
+            amount: 1, // 전체 애니메이션이 진행되는 시간
+          },
+          scrollTrigger: {
+            trigger: txtWrap,
+            start: "top 80%",
+            end: "bottom 20%",
+            scrub: .5,
+            // markers: true, 
+            },
+
+        });
+      });
+ }
+
+
+ // ScrollTrigger to pin sections with .js-pin class
+function pinSections() {
+	const sections = gsap.utils.toArray(".js-pin");
+
+	sections.forEach(section => {
+		ScrollTrigger.create({
+			trigger: section,
+			start: "bottom bottom",
+			pin: section, // 현재 섹션을 고정한다.
+			pinSpacing: false, // true로 설정하면 고정된 요소의 공간이 유지
+			onEnter: () => section.classList.add('hide'),
+			onLeave: () => section.classList.remove('hide'),
+			onEnterBack: () => section.classList.add('hide'),
+			onLeaveBack: () => section.classList.remove('hide'),
+			//markers:true,
+		});
+	});
 }
