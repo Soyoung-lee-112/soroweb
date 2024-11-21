@@ -21,14 +21,65 @@ input:-webkit-autofill:active {-webkit-box-shadow: 0 0 0 40px white inset !impor
 .btn-arrow a:hover span.arrow{width:1em;}
 .btn-arrow a:hover span.arrow i {left:0;transform: rotate(-45deg);}
 
-.m-block{display: none;}
 /*** HEADER ***/
 .header{ position: fixed; top: 0; left: 0; width: 100%; padding: 30px 40px;display: flex; justify-content: space-between; align-items: center; mix-blend-mode: difference;     backdrop-filter: blur(2px);z-index: 9;}
 .header .header-logo{width: 320px;}
 .header .gnb{font-size: 20px;font-weight: 500;}
 .header .gnb ul{display: flex; justify-content: space-between;align-items: center; gap: 40px;}
-.header .gnb ul li a{display: block; color: #fff; text-transform: uppercase;}
+.header .gnb ul li a{color: #fff; text-transform: uppercase;}
 
+.header .menu-btn {
+    height: 100%;
+    width:7vw;
+    position: absolute;
+    right: 5vw;
+    top: 0;
+    z-index: 9;
+    display:none;
+  }
+  .header .menu-btn > span {
+    background-color: #fff;
+    border-radius: 1px;
+    height: 2px;
+    width: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: 0 0 0 -3.5vw;
+    transition: height 100ms;
+  }
+  .header .menu-btn > span:after,
+  .header .menu-btn > span:before {
+    content: '';
+    background-color: #fff;
+    border-radius: 1px;
+    height: 2px;
+    width: 100%;
+    position: absolute;
+    left: 50%;
+    margin-left: -3.5vw;
+    transition: all 200ms;
+  }
+  .header .menu-btn > span:after {
+    top: -1.5vw;
+  }
+  .header .menu-btn > span:before {
+    bottom: -1.6vw;
+  }
+  .header .menu-btn.act > span {
+    height: 0;
+  }
+  .header  .menu-btn.act > span:after,
+  .header  .menu-btn.act > span:before { 
+    top: 1px;
+  }
+  .header  .menu-btn.act > span:after {
+    transform: rotate(45deg);
+  }
+  .header  .menu-btn.act > span:before {
+    transform: rotate(-45deg);
+  }   
+  
 /*** CURSOR ***/
 .cursor{pointer-events: none;}
 .cursor .cursor-ball {position: absolute; top: 0; left:0;  mix-blend-mode: difference; z-index: 5000; }
