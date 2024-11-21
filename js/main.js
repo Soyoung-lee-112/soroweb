@@ -10,6 +10,8 @@ window.onload = function () {
     initGallery();
     handleScroll();
     pinSections();
+    animateBg();
+    MarqueeLoopContainer();
 
     // rolling text style 
     const items = document.querySelectorAll(".section1 .rolling-text .rotate li.slide-in-out");
@@ -23,10 +25,10 @@ window.onload = function () {
 }
 // cursor event 
 function cursorFunc() {
-    var cursorBall = document.querySelector('.cursor-ball');
-    var cursorBallSvg = document.querySelector('.cursor-ball svg');
-    var cursorBallSvgCircle = document.querySelector('.cursor-ball svg circle');
-    var cursorAble = document.querySelectorAll('.cursor-able');
+    const cursorBall = document.querySelector('.cursor-ball');
+    const cursorBallSvg = document.querySelector('.cursor-ball svg');
+    const cursorBallSvgCircle = document.querySelector('.cursor-ball svg circle');
+    const cursorAble = document.querySelectorAll('.cursor-able');
 
     let pos = { 
         x: window.innerWidth / 2, 
@@ -49,8 +51,8 @@ function cursorFunc() {
     
     // 마우스 이동 이벤트
     window.addEventListener("mousemove", (e) => {    
-        mouse.x = e.x;
-        mouse.y = e.y;  
+        mouse.x = e.pageX;
+        mouse.y = e.pageY;
     });
     
     // ticker로 부드러운 이동 처리
@@ -91,7 +93,7 @@ function cursorFunc() {
 
             const textElement = cursorBall.querySelector('.text');
             if (textElement) {
-                cursorBall.removeChild(textElement);
+                cursorBall.removeChild(cursorBall.querySelector('.text'));
             }
 
             cursorBall.style.mixBlendMode = 'difference';
@@ -102,6 +104,8 @@ function cursorFunc() {
     });   
 }
 
+
+ 
 // Scroll animation .scroll-text element [TextPlugin]
 function animateScrollText() {
 	const scrollText = document.querySelector(".scroll-text");
@@ -133,7 +137,7 @@ function animateIndexElement() {
 			end: "bottom top",
 			scrub: 2,
 			toggleActions: "play none reverse none",
-			onEnter: () => main.classList.add("white"),
+            onEnter: () => main.classList.add("white"),
 			onLeaveBack: () => main.classList.remove("white"),
 			//markers:true
 		},
@@ -239,4 +243,79 @@ function pinSections() {
 			//markers:true,
 		});
 	});
+}
+
+
+// section4  ScrollTrigger for .background class element
+function animateBg() {
+	gsap.to(".section4  .bg img", {
+		y: "-=10%", 
+		scrollTrigger: {
+			trigger: ".section4",
+			start: "top center",  
+			scrub: 1,
+			toggleActions: "play none reverse none", 
+		},
+	}); 
+} 
+
+// section4 marquee loop
+function MarqueeLoopContainer() { 
+	const lerp = (current, target, factor) => current * (1 - factor) + target * factor;
+
+	class LoopingText {
+	  constructor(el) {
+		this.el = el;
+		this.lerp = {current: 0, target: 0}; // lerp 초기값 
+		this.interpolationFactor = 0.1;
+		this.speed = 0.01;
+		this.direction = 1; // 스크롤방향 (1:아래로, -1: 위로) 
+		this.lastScrollTop = 0;
+		this.multiplier = 1; // 이동 가속도
+		this.reverse = el.classList.contains('reverse');
+		// Init
+		this.el.style.cssText = `position: relative; display: inline-flex; white-space: nowrap`;
+		this.el.children[1].style.cssText = `position: absolute; left: ${100 * -1}%`;
+		this.el.children[2].style.cssText = `position: absolute; left: ${100 * 1}%`;
+		this.events();
+		this.render();
+	  }
+
+	  events() {
+		window.addEventListener("scroll", (e) => { 
+		  const scrollTop = window.scrollY || document.documentElement.scrollTop; 
+		  
+		  this.direction = (scrollTop > this.lastScrollTop) ? 1 : -1;
+		  this.lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+		  this.multiplier = 6; // 텍스트 이동 속도
+		});
+	  }
+
+	  animate() {
+		let direction = this.reverse ? -this.direction : this.direction;
+		if(direction == 1) {
+		  this.lerp.target -= this.speed * this.multiplier;
+		} else {
+		  this.lerp.target += this.speed * this.multiplier;
+		}
+		
+		this.lerp.current = lerp(this.lerp.current, this.lerp.target, this.interpolationFactor);
+		
+		if (this.lerp.target > 100 || this.lerp.target < -100) {
+		  this.lerp.current -= this.lerp.target; // 초기화
+		  this.lerp.target = 0;
+		}
+		
+		const x = this.lerp.current;
+		this.el.style.transform = `translateX(${x}%)`;
+		this.multiplier = 1;
+	  }
+
+	  render() {
+		this.animate();
+		window.requestAnimationFrame(() => this.render()); // 반복 호출
+	  }
+	}
+
+	document.querySelectorAll(".loop-container").forEach(el => new LoopingText(el)); 
 }
