@@ -1,17 +1,20 @@
-// GSAP 라이브러리의 스크롤트리거를 등록
+// GSAP 라이브러리 플러그인 등록
 gsap.registerPlugin(ScrollTrigger);
+// gsap.registerPlugin(ScrollToPlugin);
 gsap.registerPlugin(TextPlugin);
 
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', () => {
+  cursorFunc();
+  animateScrollText();
+  animateIndexElement();
+  initGallery();
+  handleScroll();
+  pinSections();
+  animateBg();
+  MarqueeLoopContainer();
+});
 
-    cursorFunc();
-    animateScrollText();
-    animateIndexElement();
-    initGallery();
-    handleScroll();
-    pinSections();
-    animateBg();
-    MarqueeLoopContainer();
+window.onload = function () {
 
     // rolling text style 
     const items = document.querySelectorAll(".section1 .rolling-text .rotate li.slide-in-out");
@@ -21,19 +24,6 @@ window.onload = function () {
       item.style.animation = `slide-in-out-bottom 1s linear both ${delay}s`;
     });
 
-    // menu click event
-	// $('.menu-btn').click(function() {
-	// 	$(this).toggleClass('act');
-	// 		if($(this).hasClass('act')) {
-	// 			$('.ham-bg').addClass('act');
-	// 			$('.gnb').addClass('act');
-	// 		}
-	// 		else {
-	// 			$('.ham-bg').removeClass('act');
-	// 			$('.gnb').removeClass('act');
-	// 		}
-    // });
-    
     const menuBtn = document.querySelector('.menu-btn');
     const hamBg = document.querySelector('.ham-bg');
     const gnb = document.querySelector('.gnb');
@@ -50,6 +40,16 @@ window.onload = function () {
             gnb.classList.remove('act');
         }
     })
+  
+  const topBtn = document.querySelector('.top-btn');
+
+  // topBtn.addEventListener('click', () => { 
+  //     gsap.to(window, {
+  //       duration: 1, 
+  //       scrollTo: { y: 0 }, // 최상단 이동
+  //       ease: "power2.out" // 부드러운 가속 효과
+  //   });
+  // })
     
 }
 // cursor event 
